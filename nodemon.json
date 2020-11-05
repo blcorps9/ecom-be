@@ -1,0 +1,7 @@
+{
+  "exec": "npm start",
+  "watch": [
+    "src/*"
+  ],
+  "ignore": []
+}
