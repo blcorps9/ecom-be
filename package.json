@@ -7,6 +7,10 @@
     "transpile": "babel ./src --out-dir dist",
     "build": "npm run clean && npm run transpile",
     "start": "babel-node src/index.js",
+    "seed": "babel-node src/db/seed.js",
+    "testmodel": "babel-node testmodel.js",
+    "testlodash": "babel-node testlodash.js",
+    "nodemon": "nodemon --watch src/*",
     "clean": "rimraf dist"
   },
   "dependencies": {

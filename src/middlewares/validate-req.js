@@ -2,7 +2,7 @@
 export default function validateReqSchema(schema, property) {
   return function (req, res, next) {
     const options = {
-      abortEarly: false, // include all errors
+      abortEarly: true, // include all errors
       allowUnknown: true, // ignore unknown props
       stripUnknown: true, // remove unknown props
     };

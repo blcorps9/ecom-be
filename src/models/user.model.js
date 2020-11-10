@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import { sign as jwtSign } from "jsonwebtoken";
 
 import BaseModel from "./base.model";
+import { userRoles } from "../config";
 
 import {
   jwtSecret,
@@ -9,8 +10,6 @@ import {
   jwtExpirationInterval,
   bcryptSaltRounds,
 } from "../config";
-
-const ROLES = ["user", "admin"];
 
 class UserModel extends BaseModel {
   constructor(db) {
@@ -26,14 +25,16 @@ class UserModel extends BaseModel {
 
       row.password = hash;
 
-      BaseModel.prototype.create.call(this, row);
+      return BaseModel.prototype.create.call(this, row);
+    } else {
+      throw new Error("Invalid password format.");
     }
   }
 
   async update(userId, newRow) {
     const { id, password, createdAt, ...rest } = newRow;
 
-    BaseModel.prototype.update.call(this, userId, rest);
+    return BaseModel.prototype.update.call(this, userId, rest);
   }
 
   async checkUser(password, hash) {
@@ -49,7 +50,7 @@ class UserModel extends BaseModel {
       const isUser = await this.checkUser(password, user.password);
 
       if (isUser) {
-        return this.genToken(username);
+        return this.genToken({ email: username, id: user.id });
       } else {
         throw new Error("Username and password doen not match.");
       }
@@ -64,12 +65,12 @@ class UserModel extends BaseModel {
 
   genToken(user) {
     const epoch = Date.now();
-    const playload = {
+    const payload = {
       iat: epoch,
-      sub: user,
+      ...user,
     };
 
-    return jwtSign(playload, jwtSecret, {
+    return jwtSign(payload, jwtSecret, {
       algorithm: jwtAlgorithm,
       expiresIn: jwtExpirationInterval,
     });
@@ -112,7 +113,7 @@ UserModel.fields = {
   },
   role: {
     type: "enum",
-    enum: ROLES,
+    enum: userRoles,
     default: "user",
   },
   avatar: {

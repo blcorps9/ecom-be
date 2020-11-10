@@ -8,6 +8,7 @@ import cors from "./cors";
 import { morganLogLevel } from "../config";
 
 export { default as jwt } from "./jwt";
+export { default as reqRes } from "./req-res";
 export { default as notFound } from "./not-found";
 export { default as errorHandler } from "./error-handler";
 export { default as validateReqSchema } from "./validate-req";

@@ -27,6 +27,9 @@ export default function startServer() {
   // JWT middleware
   app.use(middlewares.jwt(app, isDev));
 
+  // Req/Res helper middlewares
+  app.use(middlewares.reqRes(app, isDev));
+
   // Add routes
   routes(app, isDev);
 
