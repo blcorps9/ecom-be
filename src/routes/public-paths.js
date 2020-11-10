@@ -1,1 +1,8 @@
-export default ["/token", "/auth/login", "/auth/register", "/"];
+export default [
+  "/",
+  "/auth/login",
+  "/auth/register",
+  "/bns/search",
+  /^\/bns\/product\/.*/,
+  /^\/bns\/category\/.*/,
+];

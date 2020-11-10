@@ -7,6 +7,7 @@ export default function (app, isDev) {
     res.json({
       isError: true,
       message: err.message,
+      stack: isDev ? err.stack : [],
     });
   };
 }

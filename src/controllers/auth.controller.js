@@ -1,7 +1,7 @@
 import { jwtExpirationInterval } from "../config";
 
 export function login(app, isDev) {
-  return async (req, res, next) => {
+  return async (req, res) => {
     try {
       const { username, password } = req.body;
 
@@ -16,22 +16,32 @@ export function login(app, isDev) {
 
         res.cookie("token", token, options);
 
-        return res
-          .status(200)
-          .send({ message: "You are successfully logged in.", user });
+        return res.returnSuccess(user, "You are successfully logged in.");
       } else {
-        next(new Error("Username and password is required."));
+        return res.returnServerError("Username and password is required.");
       }
     } catch (err) {
-      next(err);
+      return res.returnServerError(err.message);
     }
   };
 }
 
 export function register(app, isDev) {
-  return (req, res) => {
-    console.log("req =-----> ", req.body);
+  return async (req, res) => {
+    try {
+      const user = await app.get("orm").User.create(req.body);
+      const token = await app.get("orm").User.genToken(user.email);
 
-    res.status(200).send({ register: 1234 });
+      const options = {
+        maxAge: jwtExpirationInterval,
+        httpOnly: !isDev,
+      };
+
+      res.cookie("token", token, options);
+
+      return res.returnCreated(user, "Successfully created new user.");
+    } catch (err) {
+      return res.returnServerError(err.message);
+    }
   };
 }

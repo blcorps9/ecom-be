@@ -1,7 +1,11 @@
+import _get from "lodash/get";
 import _has from "lodash/has";
+import _map from "lodash/map";
 import _trim from "lodash/trim";
 import _omit from "lodash/omit";
+import _filter from "lodash/filter";
 import _includes from "lodash/includes";
+import _findIndex from "lodash/findIndex";
 
 import { uuidv4, DataBaseError, filterOutProps } from "../utils";
 
@@ -36,7 +40,7 @@ function validateFields(colName, field, cell) {
     }
   } else {
     isValidVal = false;
-    errMsg = `Field type mismatch. Expected '${
+    errMsg = `Field '${colName}' type mismatch. Expected '${
       field.type
     }', actual '${typeof cell}'`;
   }
@@ -73,8 +77,12 @@ export default class BaseModel {
       const field = fields[f];
 
       if (_has(row, f)) {
-        let cell = row[f] || field.default;
+        let cell = row[f];
         let hasValidVal = true;
+
+        if (field.default && !cell) {
+          cell = field.default;
+        }
 
         if (!field.novalidation) {
           if (field.trim) cell = _trim(cell);
@@ -92,11 +100,11 @@ export default class BaseModel {
                 if (isUpdate) {
                   if (oldRow.id !== row.id) {
                     hasValidVal = false;
-                    errMsg = "Duplicate value.";
+                    errMsg = `Duplicate value for field '${f}'.`;
                   }
                 } else {
                   hasValidVal = false;
-                  errMsg = "Duplicate value.";
+                  errMsg = `Duplicate value for field '${f}'.`;
                 }
               }
             }
@@ -196,7 +204,96 @@ export default class BaseModel {
     }
   }
 
-  delete(id) {
-    return this._getTable().remove({ id }).write();
+  async delete(id) {
+    const deleted = await this._getTable().remove({ id }).write();
+
+    return deleted;
+  }
+
+  search(opts = {}) {
+    return this._getTable()
+      .filter((row) => {
+        const props = Object.keys(opts);
+
+        for (let p of props) {
+          if (_has(row, p)) {
+            if (!_includes(row[p].toLowerCase(), opts[p])) {
+              return false;
+            }
+          } else {
+            return false;
+          }
+        }
+
+        return true;
+      })
+      .value();
+  }
+
+  async pushItem(where, prop, newItem) {
+    try {
+      const oldRecord = await this.findOne(where);
+
+      if (oldRecord) {
+        const newRecord = { ...oldRecord };
+        newRecord.updatedAt = this._getTimestamp();
+
+        const existingItemIndex = _findIndex(
+          _get(newRecord, ["items"], []),
+          (i) => i && i.id === newItem.id
+        );
+
+        if (existingItemIndex > -1) {
+          newRecord[prop][existingItemIndex] = {
+            ...newRecord[prop][existingItemIndex],
+            ...newItem,
+          };
+        } else {
+          newRecord[prop] = [...newRecord[prop], newItem];
+        }
+
+        return this._getTable().find(where).assign(newRecord).write();
+      } else {
+        throw new DataBaseError("No record found");
+      }
+    } catch (e) {
+      throw new DataBaseError(e.message);
+    }
+  }
+
+  async updateItem(where, prop, newItem) {
+    try {
+      const oldRecord = await this.findOne(where);
+      const newRecord = { ...oldRecord };
+
+      newRecord.updatedAt = this._getTimestamp();
+      newRecord[prop] = _map(newRecord[prop], (i) => {
+        if (i.id && i.id === newItem.id) {
+          return Object.assign({}, i, newItem);
+        }
+
+        return i;
+      });
+
+      return this._getTable().find(where).assign(newRecord).write();
+    } catch (e) {
+      throw new DataBaseError(e.message);
+    }
+  }
+
+  async removeItem(where, prop, itemId) {
+    try {
+      const oldRecord = await this.findOne(where);
+      const newRecord = { ...oldRecord };
+
+      newRecord.updatedAt = this._getTimestamp();
+      newRecord[prop] = _filter(newRecord[prop], (i) => {
+        return i.id && i.id !== itemId;
+      });
+
+      return this._getTable().find(where).assign(newRecord).write();
+    } catch (e) {
+      throw new DataBaseError(e.message);
+    }
   }
 }

@@ -16,4 +16,18 @@ export const isProd = process.env.NODE_ENV === "production";
 export const morganLogLevel = isDev ? "dev" : "combined";
 
 // DB
+export const dbName = "db.json";
 export const restrictedFields = ["password"];
+
+// App User roles
+export const userRoles = ["admin", "user"];
+
+// Payment cards
+export const supportedCards = [
+  "visa",
+  "masterCard",
+  "amex",
+  "jcb",
+  "discover",
+  "dinersClub",
+];
