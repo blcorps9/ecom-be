@@ -1,5 +1,7 @@
 import _get from "lodash/get";
+import _size from "lodash/size";
 import _find from "lodash/find";
+import _reduce from "lodash/reduce";
 import _isEmpty from "lodash/isEmpty";
 
 export function saveAddress(app, isDev) {
@@ -381,6 +383,55 @@ export function getMyOrders(app, isDev) {
             .Orders.findAll({ user: user.id });
 
           return res.returnSuccess(myOrders);
+        } else {
+          return res.returnUnauthorized();
+        }
+      } else {
+        return res.returnUnauthorized();
+      }
+    } catch (e) {
+      return res.returnServerError(e.message);
+    }
+  };
+}
+
+// dashboard
+export function dashboard(app, isDev) {
+  return async (req, res) => {
+    try {
+      if (req.user) {
+        const user = await req.getUser();
+
+        if (user && user.id) {
+          const payload = {
+            profile: {},
+            cartCount: 0,
+            cart: {},
+            cards: [],
+            orders: [],
+            favList: {},
+            addresses: [],
+          };
+
+          try {
+            const m = app.get("orm");
+
+            payload.profile = await m.User.findById(user.id);
+            payload.cart = await m.Carts.findOne({ user: user.id });
+            payload.cartCount = _reduce(
+              _get(payload.cart, ["items"]),
+              (p, c) => p + c.quantity,
+              0
+            );
+            payload.cards = await m.Cards.findAll({ user: user.id });
+            payload.orders = await m.Orders.findAll({ user: user.id });
+            payload.favList = await m.FavList.findOne({ user: user.id });
+            payload.addresses = await m.UserAddresses.findAll({
+              user: user.id,
+            });
+          } catch (e) {}
+
+          return res.returnSuccess(payload);
         } else {
           return res.returnUnauthorized();
         }

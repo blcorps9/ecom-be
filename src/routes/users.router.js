@@ -72,8 +72,11 @@ export default function routes(app, isDev) {
     userCtlr.deleteItemFromMyCart(app, isDev)
   );
 
-  // Carts
+  // Orders
   router.get("/orders", userCtlr.getMyOrders(app, isDev));
+
+  // init
+  router.get("/dashboard", userCtlr.dashboard(app, isDev));
 
   return router;
 }
