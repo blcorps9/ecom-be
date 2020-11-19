@@ -353,11 +353,11 @@ export function deleteItemFromMyCart(app, isDev) {
         const user = await req.getUser();
 
         if (user && user.id) {
-          await app
+          const updatedCart = await app
             .get("orm")
             .Carts.removeItem({ user: user.id }, "items", req.params.id);
 
-          return res.returnDeleted();
+          return res.returnDeleted(updatedCart);
         } else {
           return res.returnUnauthorized();
         }
