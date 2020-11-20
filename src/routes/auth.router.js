@@ -19,5 +19,7 @@ export default function routes(app, isDev) {
     authCtlr.register(app, isDev)
   );
 
+  router.get("/logout", authCtlr.logout(app, isDev));
+
   return router;
 }

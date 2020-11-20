@@ -76,6 +76,19 @@ class UserModel extends BaseModel {
     });
   }
 
+  getExpiredToken(user) {
+    const epoch = Date.now();
+    const payload = {
+      iat: epoch,
+      ...user,
+    };
+
+    return jwtSign(payload, jwtSecret, {
+      algorithm: jwtAlgorithm,
+      expiresIn: 1,
+    });
+  }
+
   validatePassword(pass) {
     if (typeof pass === "string") {
       if (pass.length < 6 || pass.length > 128) {

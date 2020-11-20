@@ -45,3 +45,23 @@ export function register(app, isDev) {
     }
   };
 }
+
+export function logout(app, isDev) {
+  return async (req, res) => {
+    try {
+      const user = await req.getUser();
+      const token = await app.get("orm").User.getExpiredToken(user.email);
+
+      const options = {
+        maxAge: 1,
+        httpOnly: !isDev,
+      };
+
+      res.cookie("token", token, options);
+
+      return res.returnSuccess(null, "Successfully logged out.");
+    } catch (err) {
+      return res.returnServerError(err.message);
+    }
+  };
+}

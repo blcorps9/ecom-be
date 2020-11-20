@@ -240,11 +240,11 @@ export function deleteItemFromMyFavList(app, isDev) {
         const user = await req.getUser();
 
         if (user && user.id) {
-          await app
+          const updatedList = await app
             .get("orm")
             .FavList.removeItem({ user: user.id }, "items", req.params.id);
 
-          return res.returnDeleted();
+          return res.returnDeleted(updatedList);
         } else {
           return res.returnUnauthorized();
         }
