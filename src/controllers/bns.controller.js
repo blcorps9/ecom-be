@@ -20,7 +20,7 @@ export function getProduct(app, isDev) {
   return async (req, res) => {
     try {
       const { id } = req.params;
-      const product = await app.get("orm").Products.findById(Number(id));
+      const product = await app.get("orm").Products.findById(id);
 
       return res.returnSuccess(product);
     } catch (err) {
