@@ -1,4 +1,5 @@
 import _get from "lodash/get";
+import _map from "lodash/map";
 import _size from "lodash/size";
 import _find from "lodash/find";
 import _reduce from "lodash/reduce";
@@ -417,7 +418,14 @@ export function dashboard(app, isDev) {
             const m = app.get("orm");
 
             payload.profile = await m.User.findById(user.id);
-            payload.cart = await m.Carts.findOne({ user: user.id });
+            const cart = await m.Carts.findOne({ user: user.id });
+            const cartItems = _map(_get(cart, ["items"]), (i) => {
+              const p = m.Products.findById(i.id);
+
+              return { ...i, name: p.name, brand: p.brand, image: p.image };
+            });
+
+            payload.cart = { ...cart, items: cartItems };
             payload.cartCount = _reduce(
               _get(payload.cart, ["items"]),
               (p, c) => p + c.quantity,
