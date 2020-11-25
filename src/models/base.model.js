@@ -138,6 +138,21 @@ export default class BaseModel {
     return filterOutProps(this._getTable().find(where).value());
   }
 
+  findMany(list, chainable, raw) {
+    if (raw === true) {
+      return this._getTable()
+        .filter((p) => list.includes(p.id))
+        .value();
+    }
+
+    if (chainable) return this._getTable().filter((p) => list.includes(p.id));
+
+    return this._getTable()
+      .filter((p) => list.includes(p.id))
+      .map(filterOutProps)
+      .value();
+  }
+
   findById(id, chainable, raw) {
     if (raw === true) return this._getTable().find({ id }).value();
 
@@ -195,7 +210,7 @@ export default class BaseModel {
 
         this._getTable().find({ id }).assign(validatedRow).write();
 
-        return filterOutProps(validatedRow);
+        return filterOutProps({ ...validatedRow, id });
       } else {
         throw new DataBaseError(errMsg);
       }

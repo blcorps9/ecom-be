@@ -10,6 +10,7 @@ export const saveAddressSchema = Joi.object({
   street: Joi.string().optional(),
   city: Joi.string().required(),
   state: Joi.string().required(),
+  isDefault: Joi.boolean().required(),
 });
 
 export const updateAddressSchema = Joi.object({
@@ -22,4 +23,5 @@ export const updateAddressSchema = Joi.object({
   street: Joi.string().optional(),
   city: Joi.string().optional(),
   state: Joi.string().optional(),
+  isDefault: Joi.boolean().optional(),
 });

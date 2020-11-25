@@ -47,6 +47,10 @@ UserAddressesModel.fields = {
     type: "string",
     required: true,
   },
+  isDefault: {
+    type: "boolean",
+    required: false,
+  },
 };
 
 export default UserAddressesModel;
