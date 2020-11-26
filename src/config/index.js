@@ -25,9 +25,9 @@ export const userRoles = ["admin", "user"];
 // Payment cards
 export const supportedCards = [
   "visa",
-  "masterCard",
+  "mastercard",
   "amex",
   "jcb",
   "discover",
-  "dinersClub",
+  "diners-club",
 ];
