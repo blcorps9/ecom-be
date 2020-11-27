@@ -41,13 +41,10 @@ const colors = [
 
 async function readImages() {
   const extensions = [".jpg", ".jpeg"];
-  const imagesSaleDir = path.join(cwd, "public", "images", "sales");
   const categoriesDir = path.join(cwd, "public", "images", "categories");
-  const imagesSale = walkSync(imagesSaleDir, [], imagesSaleDir, extensions);
   const imagesCategory = walkSync(categoriesDir, [], categoriesDir, extensions);
 
   return {
-    sales: imagesSale,
     categories: _groupBy(imagesCategory, (i) => i.split("/")[0]),
   };
 }
