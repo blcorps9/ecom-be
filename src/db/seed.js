@@ -26,6 +26,13 @@ const prices = _range(99, 2000, 50);
 const shirtSizes = _range(38, 51, 2);
 const ratings = _range(1, 5.5, 0.5);
 const brands = ["Adidas", "Puma", "Nike", "Levis"];
+const promo = [
+  { label: "Sale", val: 0, condition: "" },
+  { label: "10% off", val: 10, condition: "" },
+  { label: "20% off", val: 20, condition: "" },
+  { label: "Buy 1 Get 1", val: 50, condition: "Buy 1 Get 1" },
+  { label: "Buy 2 for 50%", val: 50, condition: "Buy 2 for 50%" },
+];
 const colors = [
   "Blue",
   "Cobalt",
@@ -59,18 +66,43 @@ function getBrandName(name) {
   return brand || _sample(brands);
 }
 
+const promos = [
+  { label: "Sale", val: 0, condition: "" },
+  { label: "10% off", val: 10, condition: "" },
+  { label: "20% off", val: 20, condition: "" },
+  { label: "Buy 1 Get 1", val: 50, condition: "Buy 1 Get 1" },
+  { label: "Buy 2 for 50%", val: 50, condition: "Buy 2 for 50%" },
+];
+
 function formProduct({ category, name, brand, image }) {
   const id = uuidv4();
   const timestamp = new Date();
+  const price = _sample(prices);
+  const promo = _sample(promos);
+  let salePrice = 0;
+
+  switch (promo.condition) {
+    case "Buy 1 Get 1":
+      salePrice = price * 0.5;
+      break;
+    case "Buy 2 for 50%":
+      salePrice = price * 0.5;
+      break;
+    default:
+      salePrice = price - (price * promo.val) / 100;
+      break;
+  }
 
   const product = {
     id,
     image,
     brand,
+    price,
+    salePrice,
     createdAt: timestamp,
     updatedAt: timestamp,
+    promo: _sample(promo),
     name: _startCase(name),
-    price: _sample(prices),
     stock: _sample(stocks),
     ratings: _sample(ratings),
     reviews: _sample(reviews),
