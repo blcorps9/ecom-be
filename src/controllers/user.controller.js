@@ -422,7 +422,13 @@ export function dashboard(app, isDev) {
             const cartItems = _map(_get(cart, ["items"]), (i) => {
               const p = m.Products.findById(i.id);
 
-              return { ...i, name: p.name, brand: p.brand, image: p.image };
+              return {
+                ...i,
+                name: p.name,
+                brand: p.brand,
+                image: p.image,
+                salePrice: p.salePrice,
+              };
             });
 
             payload.cart = { ...cart, items: cartItems };
