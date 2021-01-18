@@ -9,7 +9,7 @@ const stripe = Stripe(stripeSecretKey);
 export function makePayment(app, isDev) {
   return async (req, res) => {
     try {
-      const user = req.getUser();
+      const user = await req.getUser();
 
       if (user) {
         let customerId = "";
