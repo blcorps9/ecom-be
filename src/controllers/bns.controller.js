@@ -29,6 +29,20 @@ export function getProduct(app, isDev) {
   };
 }
 
+export function getProductsById(app, isDev) {
+  return async (req, res) => {
+    try {
+      const { ids } = req.query; // ids = [id1, id2, ....idN];
+
+      const product = await app.get("orm").Products.findMany(ids);
+
+      return res.returnSuccess(product);
+    } catch (err) {
+      return res.returnServerError(err.message);
+    }
+  };
+}
+
 export function getProductsByCategory(app, isDev) {
   return async (req, res) => {
     try {

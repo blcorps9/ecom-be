@@ -7,6 +7,8 @@ const router = Router();
 export default function routes(app, isDev) {
   router.get("/search", bnsCtlr.search(app, isDev));
 
+  router.get("/products", bnsCtlr.getProductsById(app, isDev));
+
   router.get("/product/:id", bnsCtlr.getProduct(app, isDev));
 
   router.get("/category/:cat", bnsCtlr.getProductsByCategory(app, isDev));
